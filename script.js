@@ -86,7 +86,7 @@ function displayLeagueTable(teamsData) {
             <td><span class="position">${position}</span></td>
             <td>
                 <div class="team-info">
-                    <img src="${logo}" alt="${team.name}" class="team-logo">
+                    <img src="${team.logo}" alt="${team.name}" class="team-logo">
                     <span>${team.name}</span>
                 </div>
             </td>

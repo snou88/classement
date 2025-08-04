@@ -63,26 +63,71 @@ function buildManualForm() {
     container.innerHTML = '';
 
     for (let i = 1; i <= nbMatches; i++) {
-        const options = teams
-            .map(t => `<option value="${t.id}">${t.name}</option>`)
-            .join('');
-
         const row = document.createElement('div');
         row.classList.add('match-row');
-        row.innerHTML = `
-        <label>Match ${i} :</label>
-        <select name="home_team_${i}" required>
-          <option value="">-- Domicile --</option>
-          ${options}
-        </select>
-        <span>vs</span>
-        <select name="away_team_${i}" required>
-          <option value="">-- Extérieur --</option>
-          ${options}
-        </select>
-      `;
+
+        const homeSelect = document.createElement('select');
+        homeSelect.name = `home_team_${i}`;
+        homeSelect.required = true;
+        addTeamOptions(homeSelect);
+
+        const awaySelect = document.createElement('select');
+        awaySelect.name = `away_team_${i}`;
+        awaySelect.required = true;
+        addTeamOptions(awaySelect);
+
+        // Crée le label et span
+        const label = document.createElement('label');
+        label.textContent = `Match ${i} :`;
+
+        const vs = document.createElement('span');
+        vs.textContent = ' vs ';
+
+        // Ajoute au DOM
+        row.appendChild(label);
+        row.appendChild(homeSelect);
+        row.appendChild(vs);
+        row.appendChild(awaySelect);
         container.appendChild(row);
+
+        // Écouteurs pour mettre à jour les autres selects
+        homeSelect.addEventListener('change', updateAllSelects);
+        awaySelect.addEventListener('change', updateAllSelects);
     }
+}
+
+// Remplir les options
+function addTeamOptions(select) {
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = '-- Sélectionner une équipe --';
+    select.appendChild(defaultOption);
+
+    teams.forEach(team => {
+        const option = document.createElement('option');
+        option.value = team.id;
+        option.textContent = team.name;
+        select.appendChild(option);
+    });
+}
+
+// Met à jour tous les selects pour éviter les doublons
+function updateAllSelects() {
+    const allSelects = document.querySelectorAll('#matchesContainer select');
+    const selectedValues = Array.from(allSelects)
+        .map(select => select.value)
+        .filter(val => val !== '');
+
+    allSelects.forEach(select => {
+        const currentValue = select.value;
+        Array.from(select.options).forEach(option => {
+            if (option.value === '' || option.value === currentValue) {
+                option.hidden = false;
+            } else {
+                option.hidden = selectedValues.includes(option.value);
+            }
+        });
+    });
 }
 
 document.addEventListener('DOMContentLoaded', loadTeams);
@@ -123,13 +168,13 @@ function displayWeekMatches() {
         matchCard.innerHTML = `
             <div class="match-teams">
                 <div class="team">
-                    <img src="${homeTeam.logo}" alt="${homeTeam.name}" class="team-logo">
+                    <img src="${homeTeam.logo_url}" alt="${homeTeam.name}" class="team-logo">
                     <span>${homeTeam.name}</span>
                 </div>
                 <span class="vs">VS</span>
                 <div class="team">
                     <span>${awayTeam.name}</span>
-                    <img src="${awayTeam.logo}" alt="${awayTeam.name}" class="team-logo">
+                    <img src="${awayTeam.logo_url}" alt="${awayTeam.name}" class="team-logo">
                 </div>
             </div>
         `;
@@ -181,7 +226,7 @@ function displayMatchResults() {
         resultCard.innerHTML = `
             <div class="result-form">
                 <div class="team">
-                    <img src="${homeTeam.logo}" alt="${homeTeam.name}" class="team-logo">
+                    <img src="${homeTeam.logo_url}" alt="${homeTeam.name}" class="team-logo">
                     <span>${homeTeam.name}</span>
                 </div>
                 <input type="number" min="0" max="10" class="score-input" 
@@ -194,7 +239,7 @@ function displayMatchResults() {
                        onchange="updateMatchResult(${match.id}, document.querySelector('[data-home-${match.id}]').value, this.value)">
                 <div class="team">
                     <span>${awayTeam.name}</span>
-                    <img src="${awayTeam.logo}" alt="${awayTeam.name}" class="team-logo">
+                    <img src="${awayTeam.logo_url}" alt="${awayTeam.name}" class="team-logo">
                 </div>
             </div>
             ${match.status === 'completed' ?
