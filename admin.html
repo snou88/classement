@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Premier League</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1><span class="trophy">⚙️</span> Administration</h1>
+            <nav>
+                <a href="index.html" class="nav-btn">Classement</a>
+                <a href="admin.html" class="nav-btn active">Administration</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="admin-panel">
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="showTab('matches')">Créer Rencontres</button>
+                <button class="tab-btn" onclick="showTab('results')">Saisir Résultats</button>
+            </div>
+
+            <!-- Onglet Créer Rencontres -->
+            <div id="matches-tab" class="tab-content active">
+                <div class="week-info">
+                    <h3>Semaine <span id="currentWeek">1</span></h3>
+                </div>
+
+                <div class="create-matches-section">
+                    <button id="createMatchesBtn" class="btn btn-primary" onclick="loadTeams()">
+                        Créer les rencontres de la semaine
+                    </button>
+                </div>
+
+                <form id="manualMatchesForm">
+                    <h3>Créer les rencontres manuelles</h3>
+                    <div id="matchesContainer">
+                        <!-- Les lignes de match seront injectées ici par JavaScript -->
+                    </div>
+                    <button type="submit" id="submitManualMatchesBtn">Enregistrer les rencontres</button>
+                </form>
+
+                <div id="weekMatches" class="matches-list">
+                    <!-- Les rencontres seront affichées ici -->
+                </div>
+            </div>
+
+            <!-- Onglet Saisir Résultats -->
+            <div id="results-tab" class="tab-content">
+                <div class="results-section">
+                    <h3>Résultats de la semaine <span id="resultsWeek">1</span></h3>
+                    <div id="matchResults" class="match-results">
+                        <!-- Les formulaires de résultats seront affichés ici -->
+                    </div>
+                    <button id="confirmResultsBtn" class="btn btn-success" onclick="confirmAllResults()"
+                        style="display: none;">
+                        Confirmer tous les résultats
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        function loadTeams() {
+            const form = document.getElementById("manualMatchesForm");
+
+            // Afficher le formulaire s’il est caché
+            if (form.style.display === "none" || form.style.display === "") {
+                form.style.display = "block";
+                form.scrollIntoView({ behavior: "smooth" });
+            }
+
+            // Tu peux ajouter ici ta logique pour charger les équipes si nécessaire
+        }
+    </script>
+    <script src="admin.js"></script>
+</body>
+
+</html>

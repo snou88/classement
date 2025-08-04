@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premier League - Classement</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><span class="trophy">🏆</span> Premier League</h1>
+            <nav>
+                <a href="index.html" class="nav-btn active">Classement</a>
+                <a href="admin.html" class="nav-btn">Administration</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="league-table-container">
+            <h2>Classement Premier League 2025-2026 </h2>
+            <div class="table-wrapper">
+                <table class="league-table" id="leagueTable">
+                    <thead>
+                        <tr>
+                            <th>Pos</th>
+                            <th>Équipe</th>
+                            <th>J</th>
+                            <th>G</th>
+                            <th>N</th>
+                            <th>P</th>
+                            <th>BP</th>
+                            <th>BC</th>
+                            <th>Diff</th>
+                            <th>Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Les données seront chargées via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color champions"></div>
+                    <span>Champions League</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color europa"></div>
+                    <span>Europa League</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color relegation"></div>
+                    <span>Relégation</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
