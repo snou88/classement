@@ -61,7 +61,7 @@ nav {
 
 .nav-btn.active {
     background: rgba(0, 255, 135, 0.2);
-    border-color: #00ff87;
+    border-color: #fff;
 }
 
 /* Main Content */
@@ -523,3 +523,29 @@ main {
         transform: translateY(0);
     }
 }
+/* Ton footer design */
+.site-footer {
+    background: rgba(55, 0, 60, 0.95);
+    color: #eee;
+    padding: 30px 20px;
+    text-align: center;
+    font-family: 'Segoe UI', sans-serif;
+    border-top: 3px solid #00e676;
+  }
+  
+  .site-footer a {
+    color: #00bfff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  }
+  
+  .site-footer a:hover {
+    color: #00e676;
+    text-decoration: underline;
+  }
+  
+  .site-footer p {
+    margin: 5px 0;
+    font-size: 14px;
+  }

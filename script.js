@@ -86,7 +86,7 @@ function displayLeagueTable(teamsData) {
             <td><span class="position">${position}</span></td>
             <td>
                 <div class="team-info">
-                    <img src="${team.logo}" alt="${team.name}" class="team-logo">
+                    <img src="${team.logo_url}" alt="${team.name}" class="team-logo">
                     <span>${team.name}</span>
                 </div>
             </td>
@@ -94,12 +94,16 @@ function displayLeagueTable(teamsData) {
             <td>${team.won}</td>
             <td>${team.drawn}</td>
             <td>${team.lost}</td>
-            <td>${team.goals_for}</td>
-            <td>${team.goals_against}</td>
+            <td>${team.best || 0}</td>
+            <td>${team.worst || 0}</td>
             <td style="color: ${team.goal_difference > 0 ? '#00ff87' : team.goal_difference < 0 ? '#ff3838' : '#333'}">
                 ${team.goal_difference > 0 ? '+' : ''}${team.goal_difference}
             </td>
-            <td><span class="points">${team.points}</span></td>
+            <td>${team.goals_for || 0}</td>
+            <td><strong>${team.points +
+            (team.best === true || team.best == 1 ? 1 : 0) -
+            (team.worst === true || team.worst == 1 ? 1 : 0)
+            }</strong></td>
         `;
 
         tableBody.appendChild(row);

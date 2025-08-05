@@ -11,7 +11,7 @@
 <body>
     <header>
         <div class="container">
-            <h1><span class="trophy">⚙️</span> Administration</h1>
+            <h1><img src="logo/premier_league1.png" alt="" style="width: 400px; height: 100px;"></h1>
             <nav>
                 <a href="index.html" class="nav-btn">Classement</a>
                 <a href="admin.html" class="nav-btn active">Administration</a>
@@ -19,7 +19,7 @@
         </div>
     </header>
 
-    <main class="container">
+    <main class="container" style="min-height: calc(100vh - 306px);">
         <div class="admin-panel">
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="showTab('matches')">Créer Rencontres</button>
@@ -33,12 +33,12 @@
                 </div>
 
                 <div class="create-matches-section">
-                    <button id="createMatchesBtn" class="btn btn-primary" onclick="loadTeams()">
+                    <button id="createMatchesBtn" class="btn btn-primary" onclick="showManualForm()">
                         Créer les rencontres de la semaine
                     </button>
                 </div>
 
-                <form id="manualMatchesForm">
+                <form id="manualMatchesForm" style="display: none;">
                     <h3>Créer les rencontres manuelles</h3>
                     <div id="matchesContainer">
                         <!-- Les lignes de match seront injectées ici par JavaScript -->
@@ -66,17 +66,26 @@
             </div>
         </div>
     </main>
+    
+    <footer class="site-footer">
+        <div class="footer-content">
+          <p>&copy; 2025 Premier League. Tous droits réservés.</p>
+          <p>Site créé avec ❤️ par <a href="https://snouportfolio.vercel.app/" target="_blank">Ahmed Senouci</a></p>
+        </div>
+      </footer>
     <script>
-        function loadTeams() {
+        // Affiche le formulaire manuel et charge les équipes
+        function showManualForm() {
             const form = document.getElementById("manualMatchesForm");
-
-            // Afficher le formulaire s’il est caché
-            if (form.style.display === "none" || form.style.display === "") {
-                form.style.display = "block";
-                form.scrollIntoView({ behavior: "smooth" });
+            
+            // Afficher le formulaire
+            form.style.display = "block";
+            form.scrollIntoView({ behavior: "smooth" });
+            
+            // Charger les équipes depuis admin.js
+            if (typeof window.loadTeams === 'function') {
+                window.loadTeams();
             }
-
-            // Tu peux ajouter ici ta logique pour charger les équipes si nécessaire
         }
     </script>
     <script src="admin.js"></script>
