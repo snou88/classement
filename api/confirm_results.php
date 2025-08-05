@@ -6,41 +6,60 @@ $week = $input['week'];
 
 try {
     $pdo->beginTransaction();
-    
+
     // Récupérer tous les matchs terminés de la semaine
     $stmt = $pdo->prepare("SELECT * FROM matches WHERE week = ? AND status = 'completed'");
     $stmt->execute([$week]);
     $matches = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Trouver le meilleur et le pire score de la semaine
-    $maxGoals = 0;
-    $minGoals = PHP_INT_MAX;
-    $bestTeamId = null;
-    $worstTeamId = null;
-    
+
+    // Étape 1 : Calcul des buts par équipe
+    $teamGoals = [];
+
     foreach ($matches as $match) {
-        $totalGoals = $match['home_goals'] + $match['away_goals'];
-        
-        // Vérifier le meilleur score (BEST)
-        if ($totalGoals > $maxGoals) {
-            $maxGoals = $totalGoals;
-            $bestTeamId = $match['home_goals'] > $match['away_goals'] ? $match['home_team_id'] : $match['away_team_id'];
+        $homeTeamId = $match['home_team_id'];
+        $awayTeamId = $match['away_team_id'];
+        $homeGoals = $match['home_goals'];
+        $awayGoals = $match['away_goals'];
+
+        if (!isset($teamGoals[$homeTeamId])) {
+            $teamGoals[$homeTeamId] = 0;
         }
-        
-        // Vérifier le pire score (WORST)
-        if ($totalGoals < $minGoals) {
-            $minGoals = $totalGoals;
-            $worstTeamId = $match['home_goals'] < $match['away_goals'] ? $match['home_team_id'] : $match['away_team_id'];
+        if (!isset($teamGoals[$awayTeamId])) {
+            $teamGoals[$awayTeamId] = 0;
+        }
+
+        $teamGoals[$homeTeamId] += $homeGoals;
+        $teamGoals[$awayTeamId] += $awayGoals;
+    }
+
+    // Étape 2 : Déterminer les équipes BEST et WORST
+    $bestTeamIds = [];
+    $worstTeamIds = [];
+
+    if (!empty($teamGoals)) {
+        $maxGoals = max($teamGoals);
+        $minGoals = min($teamGoals);
+
+        if ($maxGoals !== $minGoals) {
+            foreach ($teamGoals as $teamId => $goals) {
+                if ($goals === $maxGoals) {
+                    $bestTeamIds[] = $teamId;
+                }
+                if ($goals === $minGoals) {
+                    $worstTeamIds[] = $teamId;
+                }
+            }
         }
     }
-    
+
+    // Étape 3 : Mise à jour des stats et points
     foreach ($matches as $match) {
         $homeGoals = $match['home_goals'];
         $awayGoals = $match['away_goals'];
         $homeTeamId = $match['home_team_id'];
         $awayTeamId = $match['away_team_id'];
-        
-        // Calculer les points et statistiques
+
+        // Résultat du match
         $homePoints = 0;
         $awayPoints = 0;
         $homeWon = 0;
@@ -49,7 +68,7 @@ try {
         $awayWon = 0;
         $awayDrawn = 0;
         $awayLost = 0;
-        
+
         if ($homeGoals > $awayGoals) {
             $homePoints = 3;
             $homeWon = 1;
@@ -64,55 +83,84 @@ try {
             $homeDrawn = 1;
             $awayDrawn = 1;
         }
-        
-        // Vérifier si l'équipe à domicile a le meilleur ou le pire score
-        $homeBest = ($homeTeamId == $bestTeamId) ? 1 : 0;
-        $homeWorst = ($homeTeamId == $worstTeamId) ? 1 : 0;
-        
-        // Vérifier si l'équipe à l'extérieur a le meilleur ou le pire score
-        $awayBest = ($awayTeamId == $bestTeamId) ? 1 : 0;
-        $awayWorst = ($awayTeamId == $worstTeamId) ? 1 : 0;
-        
-        // Mettre à jour l'équipe domicile
+
+        // Bonus/malus BEST/WORST
+        $homeBest = in_array($homeTeamId, $bestTeamIds) ? 1 : 0;
+        $homeWorst = in_array($homeTeamId, $worstTeamIds) ? 1 : 0;
+        $awayBest = in_array($awayTeamId, $bestTeamIds) ? 1 : 0;
+        $awayWorst = in_array($awayTeamId, $worstTeamIds) ? 1 : 0;
+
+        $homeMatchPoints = $homePoints;
+        $awayMatchPoints = $awayPoints;
+
+        // Stats équipe à domicile
+        $stmtCurrent = $pdo->prepare("SELECT goals_for, goals_against FROM teams WHERE id = ?");
+        $stmtCurrent->execute([$homeTeamId]);
+        $currentHome = $stmtCurrent->fetch(PDO::FETCH_ASSOC);
+        $newHomeGoalsFor = $currentHome['goals_for'] + $homeGoals;
+        $newHomeGoalsAgainst = $currentHome['goals_against'] + $awayGoals;
+        $newHomeGoalDifference = $newHomeGoalsFor - $newHomeGoalsAgainst;
+
+        // Mise à jour équipe domicile
         $stmt = $pdo->prepare("
-            UPDATE teams SET 
+            UPDATE teams 
+            SET 
                 played = played + 1,
                 won = won + ?,
                 drawn = drawn + ?,
                 lost = lost + ?,
-                goals_for = goals_for + ?,
-                goals_against = goals_against + ?,
-                goal_difference = (goals_for + ?) - (goals_against + ?),
+                goals_for = ?,
+                goals_against = ?,
+                goal_difference = ?,
                 best = best + ?,
                 worst = worst + ?,
                 points = points + ? + ? - ?
             WHERE id = ?
         ");
         $stmt->execute([
-            $homeWon, $homeDrawn, $homeLost, 
-            $homeGoals, $awayGoals,
-            $homeGoals, $awayGoals, // Pour le calcul de la différence de buts
+            $homeWon, $homeDrawn, $homeLost,
+            $newHomeGoalsFor, $newHomeGoalsAgainst, $newHomeGoalDifference,
             $homeBest, $homeWorst,
-            $homePoints, $homeBest, $homeWorst, // Points + bonus BEST - malus WORST
+            $homeMatchPoints, $homeBest, $homeWorst,
             $homeTeamId
         ]);
-        
-        // Mettre à jour l'équipe extérieure
+
+        // Stats équipe à l'extérieur
+        $stmtCurrent->execute([$awayTeamId]);
+        $currentAway = $stmtCurrent->fetch(PDO::FETCH_ASSOC);
+        $newAwayGoalsFor = $currentAway['goals_for'] + $awayGoals;
+        $newAwayGoalsAgainst = $currentAway['goals_against'] + $homeGoals;
+        $newAwayGoalDifference = $newAwayGoalsFor - $newAwayGoalsAgainst;
+
+        // Mise à jour équipe extérieure
+        $stmt = $pdo->prepare("
+            UPDATE teams 
+            SET 
+                played = played + 1,
+                won = won + ?,
+                drawn = drawn + ?,
+                lost = lost + ?,
+                goals_for = ?,
+                goals_against = ?,
+                goal_difference = ?,
+                best = best + ?,
+                worst = worst + ?,
+                points = points + ? + ? - ?
+            WHERE id = ?
+        ");
         $stmt->execute([
-            $awayWon, $awayDrawn, $awayLost, 
-            $awayGoals, $homeGoals,
-            $awayGoals, $homeGoals, // Pour le calcul de la différence de buts
+            $awayWon, $awayDrawn, $awayLost,
+            $newAwayGoalsFor, $newAwayGoalsAgainst, $newAwayGoalDifference,
             $awayBest, $awayWorst,
-            $awayPoints, $awayBest, $awayWorst, // Points + bonus BEST - malus WORST
+            $awayMatchPoints, $awayBest, $awayWorst,
             $awayTeamId
         ]);
     }
-    
+
     $pdo->commit();
     echo json_encode(['success' => true, 'message' => 'Résultats confirmés et classement mis à jour avec les points BEST/WORST']);
-    
-} catch(PDOException $e) {
+
+} catch (PDOException $e) {
     $pdo->rollBack();
     echo json_encode(['success' => false, 'message' => 'Erreur : ' . $e->getMessage()]);
 }
-?>

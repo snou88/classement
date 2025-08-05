@@ -54,3 +54,27 @@ INSERT INTO teams (name) VALUES
 ('Nottingham Forest'),
 ('Everton'),
 ('Wolves');
+
+-- Réinitialiser les stats des équipes
+UPDATE teams
+SET 
+  played = 0,
+  won = 0,
+  drawn = 0,
+  lost = 0,
+  goals_for = 0,
+  goals_against = 0,
+  goal_difference = 0,
+  points = 0,
+  best = 0,
+  worst = 0;
+
+-- Supprimer tous les matchs
+DELETE FROM matches;
+
+-- OU simplement réinitialiser les scores des matchs
+UPDATE matches
+SET 
+  home_goals = NULL,
+  away_goals = NULL,
+  status = 'scheduled';
