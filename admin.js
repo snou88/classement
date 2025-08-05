@@ -268,7 +268,22 @@ function displayMatchResults() {
 
     confirmBtn.style.display = hasResults ? 'block' : 'none';
 }
-
+/**
+ * Retourne true si tous les matchs ont un score renseigné, false sinon.
+ */
+function areAllWeekMatchesFilled() {
+    if (weekMatches.length === 0) {
+        return true;
+    }
+    const allFilled = weekMatches.every(match => {
+      // on considère "filled" dès que home_goals et away_goals sont à la fois non null, non undefined, et non vides
+      const hg = match.home_goals;
+      const ag = match.away_goals;
+      return hg != null && hg != undefined && hg != '' 
+          && ag != null && ag != undefined && ag != '';
+    });
+    return allFilled;
+  }
 // Fonction pour mettre à jour un résultat de match
 async function updateMatchResult(matchId, homeGoals, awayGoals) {
     if (homeGoals === '' || awayGoals === '') return;

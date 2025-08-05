@@ -100,9 +100,7 @@ function displayLeagueTable(teamsData) {
                 ${team.goal_difference > 0 ? '+' : ''}${team.goal_difference}
             </td>
             <td>${team.goals_for || 0}</td>
-            <td><strong>${team.points +
-            (team.best === true || team.best == 1 ? 1 : 0) -
-            (team.worst === true || team.worst == 1 ? 1 : 0)
+            <td><strong>${team.points
             }</strong></td>
         `;
 
