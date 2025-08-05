@@ -163,7 +163,7 @@ function displayWeekMatches() {
     const container = document.getElementById('weekMatches');
 
     if (weekMatches.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #666;">Aucune rencontre créée pour cette semaine.</p>';
+        container.innerHTML = '<p style="text-align: center; color: #666; margin-bottom: 15px;margin-top: 15px;font-size: large;">Aucune rencontre créée pour cette semaine.</p>';
         return;
     }
 
