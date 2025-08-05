@@ -49,7 +49,18 @@ async function loadTeams() {
     const data = await res.json();
 
     if (!data.success) {
-        alert('Erreur au chargement des équipes : ' + data.message);
+        Swal.fire({
+            title: '❌ Erreur de chargement',
+            text: 'Erreur au chargement des équipes : ' + data.message,
+            icon: 'error',
+            confirmButtonText: 'Fermer',
+            showClass: {
+              popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+              popup: 'animate__animated animate__fadeOutUp'
+            }
+          });
         return;
     }
 
@@ -281,7 +292,12 @@ async function updateMatchResult(matchId, homeGoals, awayGoals) {
             // Recharger les résultats pour mettre à jour l'affichage
             await loadMatchResults();
         } else {
-            alert('Erreur: ' + data.message);
+            Swal.fire({
+                title: '❌ Erreur',
+                text: 'Erreur : ' + data.message,
+                icon: 'error',
+                confirmButtonText: 'Fermer'
+              });
         }
     } catch (error) {
         console.error('Erreur:', error);
@@ -290,10 +306,23 @@ async function updateMatchResult(matchId, homeGoals, awayGoals) {
 
 // Fonction pour confirmer tous les résultats
 async function confirmAllResults() {
-    if (!confirm('Êtes-vous sûr de vouloir confirmer tous les résultats ? Cette action mettra à jour le classement.')) {
-        return;
-    }
-
+    Swal.fire({
+        title: 'Êtes-vous sûr ?',
+        text: 'Cette action mettra à jour le classement.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Oui, confirmer',
+        cancelButtonText: 'Annuler'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // ✅ L’utilisateur a confirmé → exécuter la suite
+          confirmerResultats(); // <-- ta fonction ou ton code ici
+        } else {
+          // ❌ L’utilisateur a annulé → ne rien faire
+          console.log('Confirmation annulée.');
+        }
+      });
+                                                                   
     const btn = document.getElementById('confirmResultsBtn');
     btn.disabled = true;
     btn.textContent = 'Confirmation en cours...';
@@ -310,7 +339,12 @@ async function confirmAllResults() {
         const data = await response.json();
 
         if (data.success) {
-            alert('Résultats confirmés ! Le classement a été mis à jour.');
+            Swal.fire({
+                title: '✅ Résultats confirmés',
+                text: 'Le classement a été mis à jour.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
             // Passer à la semaine suivante
             currentWeek++;
             document.getElementById('currentWeek').textContent = currentWeek;
@@ -327,11 +361,21 @@ async function confirmAllResults() {
             showTab('matches');
             document.querySelector('.tab-btn').click();
         } else {
-            alert('Erreur: ' + data.message);
+            Swal.fire({
+                title: '❌ Erreur',
+                text: 'Erreur : ' + data.message,
+                icon: 'error',
+                confirmButtonText: 'Fermer'
+              });
         }
     } catch (error) {
         console.error('Erreur:', error);
-        alert('Erreur de connexion');
+        Swal.fire({
+            title: '❌ Erreur',
+            text: 'Erreur de connexion',
+            icon: 'error',
+            confirmButtonText: 'Fermer'
+          });
     } finally {
         btn.disabled = false;
         btn.textContent = 'Confirmer tous les résultats';
@@ -355,13 +399,23 @@ document.getElementById('manualMatchesForm').addEventListener('submit', async e 
         const homeId = form[`home_team_${i}`].value;
         const awayId = form[`away_team_${i}`].value;
         if (homeId === awayId) {
-            alert(`Le match ${i} a la même équipe à domicile et à l'extérieur !`);
+            Swal.fire({
+                title: '⚠️ Équipe en double',
+                text: `Le match ${i} a la même équipe à domicile et à l'extérieur !`,
+                icon: 'warning',
+                confirmButtonText: 'OK',
+                showClass: {
+                  popup: 'animate__animated animate__shakeX'
+                },
+                hideClass: {
+                  popup: 'animate__animated animate__fadeOut'
+                }
+              });
             return;
         }
         matches.push({ home_team: homeId, away_team: awayId });
     }
 
-    // Désactiver le bouton pour éviter les doubles clics
     const btn = document.getElementById('submitManualMatchesBtn');
     btn.disabled = true;
     btn.textContent = 'Enregistrement en cours…';
@@ -372,16 +426,26 @@ document.getElementById('manualMatchesForm').addEventListener('submit', async e 
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ week: currentWeek, matches })
         });
+
         const data = await response.json();
+
         if (data.success) {
-            alert('Rencontres créées avec succès !');
-            // recharge l’affichage si besoin…
+            Swal.fire({
+                text: 'Rencontres créées avec succès !',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
         } else {
             throw new Error(data.message);
         }
     } catch (err) {
         console.error(err);
-        alert('Erreur : ' + err.message);
+        Swal.fire({
+            title: '❌ Erreur',
+            text: err.message,
+            icon: 'error',
+            confirmButtonText: 'Fermer'
+        });
         btn.disabled = false;
         btn.textContent = 'Enregistrer les rencontres';
     }

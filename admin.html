@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administration - Premier League</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 </head>
 
 <body>
@@ -19,7 +20,7 @@
         </div>
     </header>
 
-    <main class="container" style="min-height: calc(100vh - 306px);">
+    <main class="container" style="min-height: calc(100vh - 256px);">
         <div class="admin-panel">
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="showTab('matches')">Créer Rencontres</button>
@@ -46,42 +47,48 @@
                     <button type="submit" id="submitManualMatchesBtn">Enregistrer les rencontres</button>
                 </form>
 
-<!--             <div 
+                <!--             <div 
                  id="weekMatches" class="matches-list">
                 </div> -->
             </div>
 
             <!-- Onglet Saisir Résultats -->
             <div id="results-tab" class="tab-content">
-                <div class="results-section">
+                <div class="results-section" style="display: grid;">
                     <h3>Résultats de la semaine <span id="resultsWeek">1</span></h3>
                     <div id="matchResults" class="match-results">
                         <!-- Les formulaires de résultats seront affichés ici -->
                     </div>
                     <button id="confirmResultsBtn" class="btn btn-success" onclick="confirmAllResults()"
-                        style="display: none;">
+                        style="display: none; margin-top: 20px;">
                         Confirmer tous les résultats
                     </button>
                 </div>
             </div>
         </div>
     </main>
-    
     <footer class="site-footer">
         <div class="footer-content">
-          <p>&copy; 2025 Premier League. Tous droits réservés.</p>
-          <p>Site créé avec ❤️ par <a href="https://snouportfolio.vercel.app/" target="_blank">Ahmed Senouci</a></p>
+            <p>&copy; 2025-2026 Premier League. Tous droits réservés.</p>
+            <p>Site créé avec ❤️ par <a href="https://snouportfolio.vercel.app/" target="_blank">Ahmed Senouci</a></p>
         </div>
-      </footer>
+    </footer>
+    <div id="customModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Titre</h2>
+            <p id="modalMessage">Message ici</p>
+        </div>
+    </div>
     <script>
         // Affiche le formulaire manuel et charge les équipes
         function showManualForm() {
             const form = document.getElementById("manualMatchesForm");
-            
+
             // Afficher le formulaire
             form.style.display = "block";
             form.scrollIntoView({ behavior: "smooth" });
-            
+
             // Charger les équipes depuis admin.js
             if (typeof window.loadTeams === 'function') {
                 window.loadTeams();
@@ -89,6 +96,7 @@
         }
     </script>
     <script src="admin.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 
 </html>
