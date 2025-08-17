@@ -608,3 +608,62 @@ main {
     from { transform: scale(0.9); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
   }
+
+  :root{
+    --excel-1:#107C41;
+    --excel-2:#21A366;
+    --ink:#0f172a;
+    --bg:#ffffff;
+    --ring: 0 8px 24px rgba(16,124,65,.25);
+  }
+  .btn-excel{
+    -webkit-tap-highlight-color: transparent;
+    appearance:none;
+    border:0;
+    border-radius:16px;
+    background:
+      radial-gradient(120% 140% at 20% 20%, rgba(255,255,255,.25) 0 30%, transparent 45%),
+      linear-gradient(135deg, var(--excel-2), var(--excel-1));
+    color:#fff;
+    padding:12px 18px 12px 14px;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    font:600 15px/1.1 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+    letter-spacing:.2px;
+    cursor:pointer;
+    box-shadow: 0 6px 20px rgba(16,124,65,.25), inset 0 0 0 1px rgba(255,255,255,.2);
+    transform: translateY(0) scale(1);
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+  }
+  .btn-excel .icon{
+    display:inline-grid;
+    place-items:center;
+    width:28px;
+    height:28px;
+    border-radius:10px;
+    background: rgba(255,255,255,.12);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.15);
+  }
+  .btn-excel .label{
+    text-transform: lowercase; /* “dens” tel que demandé */
+    margin-top:1px;
+  }
+  .btn-excel:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(16,124,65,.35), inset 0 0 0 1px rgba(255,255,255,.25);
+    filter: saturate(1.05);
+  }
+  .btn-excel:active{
+    transform: translateY(0) scale(.98);
+  }
+  .btn-excel:focus-visible{
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255,255,255,.6), 0 0 0 6px rgba(16,124,65,.55), var(--ring);
+  }
+
+  /* Variante fond sombre (optionnel) */
+  @media (prefers-color-scheme: dark){
+    :root{ --ink:#e5e7eb; --bg:#0b0f14; }
+    body{ background:var(--bg); color:var(--ink); }
+  }

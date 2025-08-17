@@ -1,15 +1,106 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premier League - Classement</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Password Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+
+        .error-message {
+            color: #f44336;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
 </head>
+
 <body>
     <header>
         <div class="container">
-            <h1><span class="trophy"><img src="logo/premier_league1.png" alt="" style="width: 400px; height: 100px;"></span></h1>
+            <h1><span class="trophy"><img src="logo/premier_league1.png" alt=""
+                        style="width: 400px; height: 100px;"></span></h1>
+            <!-- Updated Excel Button -->
+            <button id="excelBtn" class="btn-excel" type="button" aria-label="Exporter vers Excel">
+                <span class="label">SEND</span>
+                <span class="icon" aria-hidden="true">
+                    <svg viewBox="0 0 48 48" width="18" height="18" role="img">
+                        <defs>
+                            <linearGradient id="g" x1="0" x2="1">
+                                <stop offset="0" stop-color="#18884F" />
+                                <stop offset="1" stop-color="#0E5A2A" />
+                            </linearGradient>
+                        </defs>
+                        <rect x="14" y="6" width="28" height="36" rx="6" fill="#21A366" />
+                        <rect x="18" y="10" width="20" height="28" rx="4" fill="#107C41" />
+                        <rect x="4" y="12" width="20" height="24" rx="4" fill="url(#g)" />
+                        <path fill="#fff"
+                            d="M10.6 30.8l4.1-6.75-3.9-6.85h3.2l2.2 4.48 2.24-4.48h3.11l-3.86 6.86 4.07 6.74h-3.18l-2.41-4.59-2.44 4.59h-3.04z" />
+                        <rect x="22" y="14" width="14" height="2.4" rx="1.2" fill="#33C481" />
+                        <rect x="22" y="19" width="14" height="2.4" rx="1.2" fill="#33C481" />
+                        <rect x="22" y="24" width="14" height="2.4" rx="1.2" fill="#33C481" />
+                        <rect x="22" y="29" width="14" height="2.4" rx="1.2" fill="#33C481" />
+                    </svg>
+                </span>
+            </button>
         </div>
     </header>
 
@@ -38,7 +129,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
             <div class="legend">
                 <div class="legend-item">
                     <div class="legend-color champions"></div>
@@ -57,11 +148,99 @@
     </main>
     <footer class="site-footer">
         <div class="footer-content">
-          <p>&copy; 2025-2026 Premier League. Tous droits réservés.</p>
-          <p>Site créé avec ❤️ par <a href="https://snouportfolio.vercel.app/" target="_blank">Ahmed Senouci</a></p>
+            <p>&copy; 2025-2026 Premier League. Tous droits réservés.</p>
+            <p>Site créé avec ❤️ par <a href="https://snouportfolio.vercel.app/" target="_blank">Ahmed Senouci</a></p>
         </div>
-      </footer>
+    </footer>
+
+    <!-- Password Modal -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Accès sécurisé</h3>
+            <p>Veuillez entrer le mot de passe pour envoyer le fichier Excel :</p>
+            <input type="password" id="passwordInput" class="password-input" placeholder="Mot de passe">
+            <div id="errorMessage" class="error-message">Mot de passe incorrect</div>
+            <button id="submitPassword" class="submit-btn">Valider</button>
+        </div>
+    </div>
 
     <script src="script.js"></script>
+    <script>
+        // Modal functionality
+        const modal = document.getElementById("passwordModal");
+        const btn = document.getElementById("excelBtn");
+        const span = document.getElementsByClassName("close")[0];
+        const submitBtn = document.getElementById("submitPassword");
+        const passwordInput = document.getElementById("passwordInput");
+        const errorMessage = document.getElementById("errorMessage");
+
+        // Open modal when button is clicked
+        btn.onclick = function() {
+            modal.style.display = "block";
+            passwordInput.focus();
+        }
+
+        // Close modal when x is clicked
+        span.onclick = function() {
+            modal.style.display = "none";
+            passwordInput.value = "";
+            errorMessage.style.display = "none";
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+                passwordInput.value = "";
+                errorMessage.style.display = "none";
+            }
+        }
+
+        // Handle password submission
+        submitBtn.onclick = async function() {
+            const password = passwordInput.value;
+            
+            try {
+                const response = await fetch('api/verify_password.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ password: password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Password is correct, proceed with Excel export
+                    modal.style.display = "none";
+                    passwordInput.value = "";
+                    errorMessage.style.display = "none";
+                    
+                    // Call your existing Excel export function here
+                    exportToExcel();
+                } else {
+                    // Show error message
+                    errorMessage.style.display = "block";
+                    passwordInput.value = "";
+                    passwordInput.focus();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = "Une erreur s'est produite. Veuillez réessayer.";
+                errorMessage.style.display = "block";
+            }
+        }
+
+        // Allow submitting with Enter key
+        passwordInput.addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                submitBtn.click();
+            }
+        });
+    </script>
 </body>
+
 </html>

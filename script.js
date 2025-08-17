@@ -108,6 +108,74 @@ function displayLeagueTable(teamsData) {
     });
 }
 
+// Fonction pour exporter le classement en Excel
+async function exportToExcel() {
+    try {
+        // Récupérer les données actuelles du classement
+        const response = await fetch(API_BASE + 'get_teams.php');
+        const data = await response.json();
+
+        if (!data.success) {
+            alert('Erreur lors de la récupération des données: ' + data.message);
+            return;
+        }
+
+        // Trier les équipes
+        const teamsData = data.teams.sort((a, b) => {
+            if (b.points !== a.points) return b.points - a.points;
+            if (b.goal_difference !== a.goal_difference) return b.goal_difference - a.goal_difference;
+            return b.goals_for - a.goals_for;
+        });
+
+        // Créer les lignes du tableau Excel
+        const excelRows = [
+            ['Position', 'Équipe', 'J', 'G', 'N', 'P', 'Meilleur', 'Pire', 'Diff', 'Pour', 'Contre', 'Points']
+        ];
+
+        teamsData.forEach((team, index) => {
+            excelRows.push([
+                index + 1,
+                team.name,
+                team.played || 0,
+                team.won || 0,
+                team.drawn || 0,
+                team.lost || 0,
+                team.best || 0,
+                team.worst || 0,
+                team.goal_difference > 0 ? `+${team.goal_difference}` : team.goal_difference,
+                team.goals_for || 0,
+                team.goals_against || 0,
+                team.points || 0
+            ]);
+        });
+
+        // Créer le contenu CSV
+        let csvContent = 'data:text/csv;charset=utf-8,';
+        excelRows.forEach(row => {
+            csvContent += row.join(';') + '\n';
+        });
+
+        // Créer un lien de téléchargement
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        
+        // Créer un nom de fichier avec la date
+        const today = new Date();
+        const dateStr = today.toISOString().split('T')[0];
+        link.setAttribute('download', `classement_premier_league_${dateStr}.csv`);
+        
+        // Ajouter le lien au document et cliquer dessus
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    } catch (error) {
+        console.error('Erreur lors de l\'exportation Excel:', error);
+        alert('Une erreur est survenue lors de l\'exportation du fichier Excel.');
+    }
+}
+
 // Charger le classement au chargement de la page
 document.addEventListener('DOMContentLoaded', function () {
     loadLeagueTable();
