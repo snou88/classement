@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premier League - Match Results</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .results-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .week-selector {
+            text-align: center;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .week-selector button {
+            background: #ffffff;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .week-selector select {
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .match-day {
+            margin-bottom: 30px;
+        }
+
+        .match-day h2 {
+            color: #ffffff;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .match-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .match-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .match-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 15px;
+        }
+
+        .team {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 40%;
+        }
+
+        .team-logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .team-name {
+            font-weight: 600;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .match-score {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .match-status {
+            text-align: center;
+            padding: 8px 0;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+
+        .performance-cards {
+            display: flex;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .performance-card {
+            flex: 1;
+            min-width: 280px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .performance-card.best {
+            border-top: 5px solid #4CAF50;
+        }
+
+        .performance-card.worst {
+            border-top: 5px solid #f44336;
+        }
+
+        .performance-card h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .performance-team {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .performance-team img {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+        }
+
+        .performance-stats {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .match-content {
+                padding: 15px 10px;
+            }
+
+            .team-logo {
+                width: 50px;
+                height: 50px;
+            }
+
+            .match-score {
+                font-size: 20px;
+                min-width: 50px;
+                flex: none;
+            }
+
+            .performance-cards {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .team-name {
+                font-size: 12px;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .no-matches {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .score {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 5px;
+        }
+
+        .score.winner {
+            color: #4CAF50;
+        }
+
+        .score.loser {
+            color: #f44336;
+        }
+
+        .nav-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .nav-button-icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .nav-button-text {
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1><span class="trophy"><img src="logo/premier_league1.png" alt="Premier League"
+                        style="width: 400px; height: 100px;"></span></h1>
+            <nav>
+                <div class="nav-buttons">
+                    <a href="index.html" class="nav-button">
+                        <span class="nav-button-icon">
+                            <i class="fas fa-table"></i>
+                        </span>
+                        <span class="nav-button-text">View Standings</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="results-container">
+        <div class="week-selector">
+            <button id="prevWeek" title="Previous week"><i class="fas fa-chevron-left"></i></button>
+            <select id="weekSelector">
+                <option value="">Loading weeks...</option>
+            </select>
+            <button id="nextWeek" title="Next week"><i class="fas fa-chevron-right"></i></button>
+        </div>
+
+        <div id="loading" class="loading">
+            <p>Loading results...</p>
+        </div>
+
+        <div id="noMatches" class="no-matches" style="display: none;">
+            No matches found for this game week.
+        </div>
+
+        <div id="performanceCards" class="performance-cards" style="display: none;">
+            <!-- Performance cards will be added here by JavaScript -->
+        </div>
+
+        <div id="matchesContainer">
+            <!-- Matches will be added here by JavaScript -->
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2025-2026 Premier League. All rights reserved.</p>
+            <p>Created with ❤️ by <a href="https://snouportfolio.vercel.app/" target="_blank">Ahmed Senouci</a></p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const weekSelector = document.getElementById('weekSelector');
+            const prevWeekBtn = document.getElementById('prevWeek');
+            const nextWeekBtn = document.getElementById('nextWeek');
+            const matchesContainer = document.getElementById('matchesContainer');
+            const loadingElement = document.getElementById('loading');
+            const noMatchesElement = document.getElementById('noMatches');
+            const performanceCardsElement = document.getElementById('performanceCards');
+            
+            let currentWeek = 1;
+            let maxWeek = 1;
+            let availableWeeks = [];
+
+            // Load initial data
+            loadWeekData();
+
+            // Event listeners
+            weekSelector.addEventListener('change', function() {
+                currentWeek = parseInt(this.value);
+                loadWeekData();
+            });
+
+            prevWeekBtn.addEventListener('click', function() {
+                if (currentWeek > 1) {
+                    currentWeek--;
+                    weekSelector.value = currentWeek;
+                    loadWeekData();
+                }
+            });
+
+            nextWeekBtn.addEventListener('click', function() {
+                if (currentWeek < maxWeek) {
+                    currentWeek++;
+                    weekSelector.value = currentWeek;
+                    loadWeekData();
+                }
+            });
+
+            // Function to load week data
+            async function loadWeekData() {
+                showLoading(true);
+                
+                try {
+                    const response = await fetch(`api/get_results.php?week=${currentWeek}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        maxWeek = data.max_week;
+                        availableWeeks = data.available_weeks || [];
+                        
+                        // Update week selector
+                        updateWeekSelector();
+                        
+                        // Display performance cards
+                        displayPerformanceCards(data.best_performance, data.worst_performance);
+                        
+                        // Display matches
+                        if (data.matches && data.matches.length > 0) {
+                            displayMatches(data.matches);
+                        } else {
+                            showNoMatches();
+                        }
+                    } else {
+                        console.error('Error loading data:', data.message);
+                        showNoMatches();
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showNoMatches();
+                } finally {
+                    showLoading(false);
+                }
+            }
+
+            // Update week selector
+            function updateWeekSelector() {
+                weekSelector.innerHTML = '';
+                
+                if (availableWeeks.length === 0) {
+                    weekSelector.innerHTML = '<option value="">No weeks available</option>';
+                    return;
+                }
+                
+                availableWeeks.forEach(week => {
+                    const option = document.createElement('option');
+                    option.value = week;
+                    option.textContent = `Game Week ${week}`;
+                    if (week === currentWeek) {
+                        option.selected = true;
+                    }
+                    weekSelector.appendChild(option);
+                });
+                
+                // Enable/disable navigation buttons
+                prevWeekBtn.disabled = currentWeek <= 1;
+                nextWeekBtn.disabled = currentWeek >= maxWeek;
+            }
+
+            // Display performance cards
+            function displayPerformanceCards(best, worst) {
+                performanceCardsElement.innerHTML = '';
+                
+                if (!best && !worst) {
+                    performanceCardsElement.style.display = 'none';
+                    return;
+                }
+                
+                performanceCardsElement.style.display = 'flex';
+                
+                // Best performance
+                if (best) {
+                    const bestCard = createPerformanceCard(best, 'best', 'Best Performance');
+                    performanceCardsElement.appendChild(bestCard);
+                }
+                
+                // Worst performance
+                if (worst) {
+                    const worstCard = createPerformanceCard(worst, 'worst', 'Worst Performance');
+                    performanceCardsElement.appendChild(worstCard);
+                }
+            }
+            
+            // Create a performance card
+            function createPerformanceCard(team, type, title) {
+                const card = document.createElement('div');
+                card.className = `performance-card ${type}`;
+                
+                const logoUrl = team.team_logo || 'logo/default.png';
+                
+                card.innerHTML = `
+                    <h3>${title}</h3>
+                    <div class="performance-team">
+                        <img src="${logoUrl}" alt="${team.team_name}" onerror="this.src='logo/default.png'">
+                        <div>
+                            <div style="font-weight: bold; font-size: 18px;">${team.team_name}</div>
+                            <div>${team.goals_scored} Points </div>
+                        </div>
+                    </div>
+                `;
+                
+                return card;
+            }
+
+            // Display matches
+            function displayMatches(matches) {
+                matchesContainer.innerHTML = '';
+                noMatchesElement.style.display = 'none';
+                
+                // Group matches by date if needed (removed date-based grouping)
+                const matchesSection = document.createElement('div');
+                matchesSection.className = 'match-day';
+                
+                matchesSection.innerHTML = '<h2>Match Results</h2>';
+                
+                // Add matches
+                matches.forEach(match => {
+                    const matchCard = document.createElement('div');
+                    matchCard.className = 'match-card';
+                    
+                    const homeLogo = match.home_team_logo || 'logo/default.png';
+                    const awayLogo = match.away_team_logo || 'logo/default.png';
+                    
+                    matchCard.innerHTML = `
+                        <div class="match-content">
+                            <div class="team">
+                                <img src="${homeLogo}" alt="${match.home_team_name}" class="team-logo" onerror="this.src='logo/default.png'">
+                                <div class="team-name">${match.home_team_name}</div>
+                            </div>
+                            <div class="match-score">
+                                <span class="score ${match.home_goals > match.away_goals ? 'winner' : match.home_goals < match.away_goals ? 'loser' : ''}">${match.home_goals}</span> - 
+                                <span class="score ${match.away_goals > match.home_goals ? 'winner' : match.away_goals < match.home_goals ? 'loser' : ''}">${match.away_goals}</span>
+                            </div>
+                            <div class="team">
+                                <img src="${awayLogo}" alt="${match.away_team_name}" class="team-logo" onerror="this.src='logo/default.png'">
+                                <div class="team-name">${match.away_team_name}</div>
+                            </div>
+                        </div>
+                        <div class="match-status">Completed</div>
+                    `;
+                    
+                    matchesSection.appendChild(matchCard);
+                });
+                
+                matchesContainer.appendChild(matchesSection);
+            }
+            
+            // Show loading state
+            function showLoading(show) {
+                loadingElement.style.display = show ? 'block' : 'none';
+                if (show) {
+                    matchesContainer.innerHTML = '';
+                    performanceCardsElement.style.display = 'none';
+                    noMatchesElement.style.display = 'none';
+                }
+            }
+            
+            // Show no matches message
+            function showNoMatches() {
+                matchesContainer.innerHTML = '';
+                noMatchesElement.style.display = 'block';
+                performanceCardsElement.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
