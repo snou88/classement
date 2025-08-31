@@ -6,7 +6,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 
 // In a production environment, use environment variables or a secure configuration file
 // This is just for demonstration purposes
-$validPassword = 'your_secure_password_here'; // Replace with a strong password
+$validPassword = 'm'; // Replace with a strong password
 
 // Get the raw POST data
 $input = file_get_contents('php://input');
