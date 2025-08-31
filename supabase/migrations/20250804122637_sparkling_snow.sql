@@ -32,6 +32,9 @@ CREATE TABLE IF NOT EXISTS matches (
     FOREIGN KEY (away_team_id) REFERENCES teams(id)
 );
 
+ALTER TABLE matches
+  ADD COLUMN processed TINYINT(1) DEFAULT 0;
+
 -- Insérer les équipes de Premier League
 INSERT INTO teams (name) VALUES 
 ('Manchester City'),
