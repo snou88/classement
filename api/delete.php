@@ -1,9 +1,5 @@
 <?php
-// Connexion à la base MySQL
-$host = "localhost";
-$user = "root";
-$pass = "";
-$dbname = "football_league"; // change par le nom de ta base
+require_once 'config.php';
 
 $conn = new mysqli($host, $user, $pass, $dbname);
 
