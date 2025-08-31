@@ -14,7 +14,7 @@ if (!isset($_FILES['excelFile'])) {
 
 $file = $_FILES['excelFile'];
 $uploadDir = __DIR__ . '/uploads/';
-$targetFile = $uploadDir . 'Results_V2.xlsx';
+$targetFile = $uploadDir . 'Results_V2_updated.xlsx';
 
 // Create uploads directory if it doesn't exist
 if (!file_exists($uploadDir)) {
